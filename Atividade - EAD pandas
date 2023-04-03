@@ -1,0 +1,244 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import os
+
+        
+        
+        
+################################################ INICIO DA PRIEMIRA QUESTÃO ############################################
+        
+#importando o banco de dados         
+dadoscovid = pd.read_csv("covid_19_clean_complete.csv")
+dadoscovid.head()
+
+
+#RESOLUÇÃO DA 1° QUESTÃO
+# variaveis do Item A 
+n_linhas = dadoscovid.shape[0]
+n_colunas = dadoscovid.shape[1]
+
+# variaveis do Item B 
+tipos_de_dados = dadoscovid.dtypes
+
+# variaveis do Item C
+conteudo_das_colunas = dadoscovid.columns
+
+# variaveis do Item d 
+dadoscovid['Date']=pd.to_datetime(dadoscovid['Date'])
+
+#variaveis do item E 
+#só aplicar o comando describle
+
+#variaveis do item F 
+#variaveis do item G 
+n_vazios = dadoscovid[dadoscovid.columns[1]].count() #onumero de NaN
+
+
+#saidas da 1° questão 
+
+#item A 
+print('item A: ')
+print ("o numero de linhas é: ",n_linhas)
+print ('o Numero de colunas é: ' ,n_colunas)
+print ()
+#item B 
+print ('item B')
+print ('o conteudo das colunas é : ')
+print (conteudo_das_colunas)
+print()
+#item C 
+print ('Item C')
+print ("os dados presentes nas colunas vem a seguir:")
+print()
+print (tipos_de_dados)
+print()
+#Item D 
+print ('Item D')
+print ("A coluna Transformada")
+dadoscovid.info()
+print ()
+#Item E
+print ('Item E')
+display(dadoscovid.describe())
+print ()
+#item G 
+print ('Item G')
+print ( "o numero de elementos vazios que possuem o NaN são :" , n_vazios)
+print()
+
+################################################ FIM DA PRIEMIRA QUESTÃO ##########################\#################
+
+
+
+
+################################################ INICIO DA SEGUNDA QUESTÃO ############################################
+
+#RESOLUÇÃO DA 2° QUESTÃO
+
+#variaveis do Item A 
+selecionado = dadoscovid.loc[(dadoscovid['Country/Region']=='China')]
+sem_duplicatas = selecionado.sort_values('Confirmed', ascending=False)
+dataframe = sem_duplicatas.drop_duplicates(subset='Province/State', keep='first')
+itema = dataframe[['Country/Region', 'Province/State']]
+  
+
+#variaveis do Item B 
+dados_das_provincias_chinesas = (dataframe.describe())
+
+#variaveis do Item C 
+informacoes = dataframe.loc[:,['Province/State','Confirmed', 'Deaths', 'Recovered', 'Active']]
+
+#variaveis do Item E
+os_maiores = informacoes.sort_values('Confirmed', ascending = False)
+
+
+
+#saidas da 2° questão 
+
+#item A 
+print('item A: ')
+print('As provincias da china que estão no data frame :')
+display (itema)
+print ()
+
+#item b
+print('item B: ')
+print('As informações das provincias são :')
+display (dados_das_provincias_chinesas)
+print ()
+
+#Item C 
+print('item C: ')
+print('segundo as informações pedidas :')
+display (informacoes)
+print ()
+
+#Item E
+print('item E: ')
+print('As 5 maiores região :')
+display (os_maiores.head(5))
+print ()
+
+
+################################################ FIM DA SEGUNDA QUESTÃO ############################################
+
+
+
+################################################ INICIO DA TERCEITRA QUESTÃO ############################################
+
+
+#RESOLUÇÃO DA 3° QUESTÃO
+#notna - não numeros vazios - quando ta vazio retorna falso 
+
+#variaveis/ função pedida no intem A 
+def juntar(covid_sem_vazio):
+    if covid_sem_vazio.notna()['Province/State'] == True:
+        covid_sem_vazio['Country/Region'] = covid_sem_vazio['Country/Region'] + '-' + covid_sem_vazio['Province/State']
+    return covid_sem_vazio
+
+#variaveis do item B
+dadoscovid_novo = dadoscovid.copy()
+
+
+#Variaveis do item C
+dadoscovid_novo = dadoscovid.apply(juntar, axis = 1)
+
+#variaveis do item D
+dadoscovid_novo_sem_province = dadoscovid_novo.drop(columns = ['Province/State'])
+
+
+#saidas da 3° questão 
+
+
+#Item C 
+print('item C: ')
+print('O novo Dataframe com as informaões solicitas é :')
+display (dadoscovid_novo)
+print ()
+
+#Item D
+print('item D: ')
+print('O Dataframe sem a coluna de "Province/Stade" fica dessa forma :')
+display (dadoscovid_novo_sem_province)
+print ()
+
+
+
+################################################ FIM DA TERCEIRA QUESTÃO ############################################
+
+
+
+################################################ INICIO DA QUARTA QUESTÃO ############################################
+
+#RESOLUÇÃO DA 4° QUESTÃO 
+
+#variaveis do Item A 
+dadosmundo = pd.read_csv("country_wise_latest.csv")
+
+#variaveis do Item B
+dadosmundob = dadosmundo.loc[:,['Country/Region' , 'Continent' , 'Population' ,'TotalDeaths' ]]
+
+#Variaveis do Item C
+dadosmundo_somado = dadoscovid[['Country/Region', 'Deaths']].groupby('Country/Region').sum()
+
+#Variaveis do Item D
+dataframe_com3info = dadosmundo_somado.merge(dadosmundo.loc[:,['Country/Region', 'Population', 'Continent']],how = 'right', on = 'Country/Region')
+
+
+#######MergeError: No common columns to perform merge on. Merge options: left_on=None, right_on=None, left_index=False, right_index=False
+
+
+#Variaveis do Item E
+dadosmundo_continetes = dataframe_com3info.groupby('Continent').sum()
+
+#Variaveis do Item F
+
+dadosmundo_mortemilho = dadosmundo_continetes.copy()
+dadosmundo_mortemilho['Mortes/Milhão'] = (dadosmundo_continetes.Deaths/dadosmundo_continetes.Population)*(1000000)
+
+#Variaveis do Item G
+classificasao = dadosmundo_mortemilho.sort_values('Mortes/Milhão', ascending = False)
+
+#saidas da 2° questão 
+
+#item B
+print('item B: ')
+print('Informações de população, país e continentes do banco de dados')
+display (dadosmundob)
+print ()
+
+#item C
+print('item C: ')
+print('Foi utilidazado a versão original, pois o arquivo modificado no "item C" tinha mais precisão por conta da ausencia de moficiação nos itens ')
+print ()
+
+#Item D
+print('item D: ')
+print('O DataFrame com as 3 informações pedidas é :')
+display (dataframe_com3info)
+print ()
+
+
+#Item E
+print('item E: ')
+print('O Datasheet com a informação somente por continentes é: ')
+display (dadosmundo_continetes)
+print ()
+
+#Item F
+print('item F: ')
+print('O Datasheet com a nova informação de morte por milhão, se torna : ')
+display (dadosmundo_mortemilho)
+print ()
+
+
+#Item G
+print('item G: ')
+print('O Datasheet Organizado , pelo numero de mortes por milhão é dado a seguir : ')
+display (classificasao)
+print ()
+
+
+
+
+#################### FIM DA QUARTA QUESTÃO ####################
