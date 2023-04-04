@@ -1,0 +1,135 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import os
+
+        
+        
+        
+############################ INICIO DA 1° QUESTÃO #############################
+        
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import os
+import matplotlib.pyplot as plt
+%matplotlib inline
+import seaborn as sns
+
+
+print("Setup Complete")
+        
+#importando o banco de dados         
+dadoscovid = pd.read_csv('../input/corona-virus-report/covid_19_clean_complete.csv')
+display( dadoscovid)
+
+#exercisio 5.1 - Line Chart
+dadoscovid_trabalhado = dadoscovid.copy()
+covid_agrupado = dadoscovid_trabalhado.groupby(['Date', 'WHO Region'],sort = False).sum('Deaths')
+covid_agrupado=covid_agrupado.drop(['Africa','South-East Asia','Western Pacific'], axis = 0, level = 'WHO Region')
+#covid_a = dadoscovid_trabalhado.loc[(dadoscovid_trabalhado['WHO Region'] == 'Europe')]
+#covid_a = covid_a.loc[:,['Date', 'WHO Region', 'Deaths']].groupby(['Date', 'WHO Region']).sum().reset_index(level='Date')
+#covid_b = dadoscovid_trabalhado.loc[(dadoscovid_trabalhado['WHO Region'] == "Americas")]
+#covid_b = covid_b.loc[:,['Date', 'WHO Region', 'Deaths']].groupby(['Date', 'WHO Region']).sum().reset_index(level='Date')
+#covid_c = dadoscovid_trabalhado.loc[(dadoscovid_trabalhado['WHO Region'] == "Eastern Mediterranean")]
+#covid_c = covid_c.loc[:,['Date', 'WHO Region', 'Deaths']].groupby(['Date', 'WHO Region']).sum().reset_index(level='Date')
+
+
+
+#FAZENDO CONFIGURAÇÕES EM RELAÇÃO AO GRÁFICO A SER PLOTADO
+#plt.figure(figsize=(20,6))
+
+plot = sns. lineplot (data=covid_agrupado, x="Date", y= "Deaths", hue = 'WHO Region')
+
+plt.grid(True)
+plt.title('Numero de mortes de covid-19')
+
+
+
+####### REPOSTAS DA 1° QUESTÃO #########
+#Respostas das questões 
+
+# 1° - A regiaõ com mais mortes foi no continente americano
+
+# 2° - a progressão começa .... foi impossivel de datar devido ao um erro para rodar o codigo, onde é impossivel ler os valores no grafico 
+#porém é possivel apontar.
+
+# 3° - todas cressem com uma taxa exponencial bem grande ao longo do tempo 
+
+
+############################ FIM DA 1° QUESTÃO #############################
+
+
+
+############################ INICIO DA 2° QUESTÃO #############################
+
+#exercisio 5.2 - Line Chart
+#Variaveis do item A 
+##importantdo o grafico do item 4
+dadosmundo = pd.read_csv("../input/corona-virus-report/worldometer_data.csv")
+
+
+z = dadosmundo.groupby('Continent' ).sum('TotalDeaths')
+z["Morte_por_Milhão"] = ((z.TotalDeaths/z.Population)* 10**6)
+
+
+# Saida da atividade de line chart
+plot = sns.barplot(data=z, x= z.index , y= 'TotalDeaths')
+plt.title('RELAÇÃO DE MORTE X CONTINENTE')
+plt.figure(figsize=(10,6))
+
+
+####### REPOSTAS DA 2° QUESTÃO #########
+
+#Respostas das questões 
+
+# 1° - os continentes com mais mortes foram o europeu , e o norte americano 
+
+# 2° - o com o menor numero de mortes é o continente afriacano 
+
+# 3° - foi feita uma analise do grafico em questão 
+
+
+############################ FIM DA 2° QUESTÃO #############################
+
+
+
+
+############################ INCIO DA 3° QUESTÃO #############################
+
+#exercisio 5.3 - Scatter Plots
+dadosmundo = pd.read_csv("../input/corona-virus-report/worldometer_data.csv")                                             
+
+#o mean faz a media das mortes por continente                       
+dadosmundo3_desejado = dadosmundo.groupby('Continent').mean("Deaths/1M pop")
+
+dadosmundo3_desejado.drop(['Australia/Oceania', 'Asia', 'Africa'], axis=0, inplace=True)
+
+
+display(dadosmundo3_desejado)
+plt.figure(figsize=(10,6))
+
+# Saida da atividade de Scatter Plots
+sns.scatterplot(data=dadosmundo3_desejado, x="Deaths/1M pop", y='Population', hue= 'Continent')
+plt.title("Relação do numero de mortes À Quantidade De População")
+plt.xlabel('Mortes por milhão')
+plt.ylabel('População total')
+
+
+
+############################ FIM DA 3° QUESTÃO #############################
+
+
+
+
+########################### INCIO DA 4° QUESTÃO ############################
+
+#exercisio 5.4 - Scatter Plots
+hotplot = sns.heatmap(dadosmundo.corr())
+
+variavel_pra_correlasao = dadosmundo[['Population', 'Deaths/1M pop']]
+
+plt.title('Relação')
+plt.show(hotplot)
+sns.heatmap(variavel_pra_correlasao.corr())
+plt.title('Relação')
+
+####################### FIM DA 4° QUESTÃO ###############################
