@@ -1,0 +1,130 @@
+
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+import seaborn as sns
+
+#conhecer um banco de dados ,e com pedições prever um novo conjuto de dados 
+#train e test - generalização , usar dados novos , não dados de test , para testar a eficacia ,e  sim os dados do train 
+# pra tal vou  modelar usando o train 
+#gender submission me da: 0.76555
+
+# O nosso codigo conseguiu : 0,62679
+
+### VIZUALIZAÇÃO DO BANCO DE DADOS ###
+
+## leganda do banco de dados ##
+#PassengerId - indentificador de cada passageiro 
+#survived - o que eu preciso prever , se sobreviveu ou não no naufragio 
+#Pclass - qual classe ele estava (1° , 2° , 3° )
+#name - é o nome né 
+#sex - seguindo a logica de mulheres e crianças priemiro 
+#idade - idade do individo 
+#SibSp - indicador se a pessoa estava viajando com alguém , acompanhante ou coisa do tipo 
+#Parch - se a pessoa estava aconapnhanda de filhos , ou era filha de alguém que estvaa lá 
+#Ticket - o numero d apassagem 
+# fare - é o preço da passsagem da pessoa 
+# cabin - o numero da cabine da pessoa 
+#Embarked - em qual porto ela embracou no navio( S,C , e mais um )
+
+
+####### inicio do codigo #########
+
+##################  QUESTÃO 6.1 #####################
+train = pd.read_csv('../input/titanic/train.csv')
+test = pd.read_csv('../input/titanic/test.csv')
+
+
+
+###  item B da apostila ######
+train.describe( )
+print()
+test.describe()
+
+
+
+##### ITEM D, E DA APOSTILA ############
+
+#ARRUMANDO O BANCO DE DADOS 
+
+#limpeza do banco de dados  
+#sumindo com valores que são do tipo NaN , que atrapalham no funcionamento do aprendizado
+train_clean = train.fillna(0)
+test_clean = test.fillna(0)
+
+
+########## ITEM C  DA APOSTILA #############
+
+train.info()
+print()
+test.info()
+
+print ('Os valores vazios')
+print('No dataframe de test')
+print(test_clean.isnull().sum())
+print()
+print('No dataframe de treino')
+print(train_clean.isnull().sum())
+
+
+
+
+
+
+########################    QUESTÃO 6.2 #####################
+
+#SEPARAÇÃO DE IDADES : 
+idades = ['(0-10)','(10-20)','(20-30)','(30-40)','(40-50)','(50-60)','(60- 70)','(+70)']
+# bins mostra os paramertros de cada separação, de cada um dos valores 
+bins = [0,10,20,30,40,50,60,70,np.inf]
+train_clean['Intervalo de Idade']=pd.cut(train_clean['Age'],bins, labels = idades)
+display(train_clean)
+
+
+#o grafico 
+
+grafico = sns.barplot(data=train_clean, x='Intervalo de Idade',y= "Survived")
+
+test_clean = test_clean.drop(['Cabin'], axis = 1)
+train_clean = train_clean.drop(['Cabin'], axis = 1)
+
+display(test_clean)
+
+
+
+
+
+
+
+################ QUESTÃO 6.3 #############
+
+# O Modelo ## 
+from sklearn.ensemble import RandomForestClassifier #arvore de decisçao 
+#n_estimators - são a quantidade de arvores de decisão 
+#n_jobs - especifica o número de núcleos a serem usados para as principais tarefas de machine learning
+modelo = RandomForestClassifier(n_estimators = 100 , n_jobs =-1, random_state=0)
+
+
+# Variavel de entrada pra treinar o modelo 
+#somente variaveis numericas 
+variaveis = ['Pclass','Age','SibSp','Parch','Fare' ]
+x = train_clean[variaveis]
+#o que queremos prever 
+y = train_clean["Survived"]
+
+#ajuste do modelo
+modelo.fit(x,y)
+
+#APLICANDO O MODELO NOS DADOS DE TESTE TAMBÉM##
+x_prev = test_clean[variaveis]
+
+
+
+
+
+
+#APLICANDO A PREVISÃO DE FATO#
+previsto = modelo.predict(x_prev)
+previsoes = pd.Series(previsto, index =test['PassengerId'], name = "Survived")
+## o resultado para a competição 
+previsoes.to_csv("Machine Learning- primeiro modelo do NIAS - IA.csv", header= True)
