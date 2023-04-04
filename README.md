@@ -19,6 +19,6 @@
 
 #6° Atividade a respeito de aperfeiçoamento de maquina com o terceiro modelo do titanic - com um score atingido de 0.979752
 
-
+#7° Atividade a respeito da validação de dados cruzada, e o gradient boosting
 
 
