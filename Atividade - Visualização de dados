@@ -25,10 +25,9 @@ display( dadoscovid)
 dadoscovid_trabalhado = dadoscovid.copy()
 covid_agrupado = dadoscovid_trabalhado.groupby(['Date', 'WHO Region'],sort = False).sum('Deaths')
 covid_agrupado=covid_agrupado.drop(['Africa','South-East Asia','Western Pacific'], axis = 0, level = 'WHO Region')
+
+
 #covid_a = dadoscovid_trabalhado.loc[(dadoscovid_trabalhado['WHO Region'] == 'Europe')]
-#covid_a = covid_a.loc[:,['Date', 'WHO Region', 'Deaths']].groupby(['Date', 'WHO Region']).sum().reset_index(level='Date')
-#covid_b = dadoscovid_trabalhado.loc[(dadoscovid_trabalhado['WHO Region'] == "Americas")]
-#covid_b = covid_b.loc[:,['Date', 'WHO Region', 'Deaths']].groupby(['Date', 'WHO Region']).sum().reset_index(level='Date')
 #covid_c = dadoscovid_trabalhado.loc[(dadoscovid_trabalhado['WHO Region'] == "Eastern Mediterranean")]
 #covid_c = covid_c.loc[:,['Date', 'WHO Region', 'Deaths']].groupby(['Date', 'WHO Region']).sum().reset_index(level='Date')
 
