@@ -1,0 +1,136 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+import seaborn as sns
+#outros imputs
+
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder
+
+#conhecer um banco de dados ,e com pedições prever um novo conjuto de dados 
+#train e test - generalização , usar dados novos , não dados de test , para testar a eficacia ,e  sim os dados do train 
+# pra tal vou  modelar usando o train 
+#gender submission me da:
+    
+####### inicio do codigo #########
+train = pd.read_csv('../input/titanic/train.csv')
+test = pd.read_csv('../input/titanic/test.csv')
+
+
+### VIZUALIZAÇÃO DO BANCO DE DADOS ###
+
+## leganda do banco de dados ##
+#PassengerId - indentificador de cada passageiro 
+#survived - o que eu preciso prever , se sobreviveu ou não no naufragio 
+#Pclass - qual classe ele estava (1° , 2° , 3° )
+#name - é o nome né 
+#sex - seguindo a logica de mulheres e crianças priemiro 
+#idade - idade do individo 
+#SibSp - indicador se a pessoa estava viajando com alguém , acompanhante ou coisa do tipo 
+#Parch - se a pessoa estava aconapnhanda de filhos , ou era filha de alguém que estvaa lá 
+#Ticket - o numero d apassagem 
+# fare - é o preço da passsagem da pessoa 
+# cabin - o numero da cabine da pessoa 
+#Embarked - em qual porto ela embracou no navio( S,C , e mais um )
+
+
+
+
+importando o qu ejá existe para limpeza do banco de dados: 
+train = pd.read_csv('../input/titanic/train.csv')
+test = pd.read_csv('../input/titanic/test.csv')
+
+train_clean = train
+test_clean = test
+
+
+
+
+
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+
+
+
+####### Criando a função do item solicitado na apostila ######
+
+### os valores da função conforeme o solicitado são : 
+#data: Banco de dados a partir do qual será produzido o modelo.
+#● encoder: a estratégia de encoding de variáveis categóricas,
+#como one-hot ou label encoder.
+#● model: o algoritmo que irá produzir o modelo, inicialmente será
+#o random forest classifier.
+#● numerical_imputer: a estratégia usada para substituir valores
+#nulos nas features numéricas, como "mean" ou "median".
+#● categorical_imputer: estratégia para preencher valores nulos
+#nas features categóricas, aqui será usada apenas "most
+#frequent", que é substituir pelo valor que mais aparece no banco
+#de dados.
+
+
+def pipeline(data, encoder, model, numerical_imputer, categorical_imputer):   
+        categorical_cols = [coln for coln in data.columns if data[coln].nunique() < 10 and data[coln].dtype == 'object']
+        numerical_cols = [coln for coln in data.columns if data[coln].dtype in ['float64', 'int64'] and coln not in ['Survived', 'Name', 'PassengerId', 'Ticket', 'Cabin']]
+        colunas = categorical_cols + numerical_cols
+        target = data['Survived']
+        X = data[colunas]
+        X_train, X_valid, y_train, y_valid = train_test_split(X, target, test_size=0.2, random_state=0)
+        
+        # Preprocessing for numerical data
+        numerical_transformer = SimpleImputer(strategy='constant')
+
+        # Preprocessing for categorical data
+        categorical_transformer = Pipeline(steps=[('imputer', SimpleImputer(strategy='most_frequent')),('encode', encoder)])
+        categorical_transformer = Pipeline(steps=[
+            ('imputer', SimpleImputer(strategy='most_frequent')),
+            ('encode', encoder)])
+          
+        # Bundle preprocessing for numerical and categorical data
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', numerical_transformer, numerical_cols),
+                ('cat', categorical_transformer, categorical_cols)
+            ])
+        
+        
+
+    # Bundle preprocessing and modeling code in a pipeline
+        clf = Pipeline(steps=[('preprocessor', preprocessor),
+                      ('model', model)
+                     ])
+
+    # Preprocessing of training data, fit model 
+        clf.fit(X_train, y_train)
+
+    # Preprocessing of validation data, get predictions
+        preds = clf.predict(X_valid)
+
+        print('MAE:', mean_absolute_error(y_valid, preds))
+        
+        
+        
+        score = accuracy_score(y_valid, preds)
+        scorep = (score * 100)
+        resultados = print('enco:',encoder, numerical_transformer, scorep)
+        print(score.mean())
+        return resultados
+    
+    
+    
+resultados = ['mean', 'median', 'most_frequent', 'constant']
+encoders = [OneHotEncoder(handle_unknown='ignore',sparse=False), OrdinalEncoder()]
+cateim='most_frequent'
+for i in encoders:
+    for j in rw:
+        score = pipeline(train,i,RandomForestClassifier(),j,cateim)
+        
