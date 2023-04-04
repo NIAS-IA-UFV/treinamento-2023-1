@@ -17,7 +17,7 @@
 #5° Atividade a respeito de limpeza de dados com o segundo modelo do titanic  - atingindo um score de 0,60526
 
 
-#6° Atividade a respeito de aperfeiçoamento de maquina com o terceiro modelo do titanic ( incompleto ) -- erro encontrado, sem solução
+#6° Atividade a respeito de aperfeiçoamento de maquina com o terceiro modelo do titanic - com um score atingido de 0.979752
 
 
 
