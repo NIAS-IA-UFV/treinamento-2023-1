@@ -12,6 +12,7 @@
 
 
 #4° Atividade a respeito do 1° modelo de machine learning com o modelo do titanic (completo) 
+
 #atingindo um score de 0.62679
 
 
