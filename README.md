@@ -11,7 +11,8 @@
 #3° - Atividade a respeito EDA de vizualização de dados (Completa) 
 
 
-#4° Atividade a respeito do 1° modelo de machine learning com o modelo do titanic 
+#4° Atividade a respeito do 1° modelo de machine learning com o modelo do titanic (completo) 
+#atingindo um score de 0.62679
 
 
 #5° Atividade a respeito de limpeza de dados com o segundo modelo do titanic 
