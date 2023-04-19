@@ -1,0 +1,175 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+import seaborn as sns
+
+#conhecer um banco de dados ,e com pedições prever um novo conjuto de dados 
+#train e test - generalização , usar dados novos , não dados de test , para testar a eficacia ,e  sim os dados do train 
+# pra tal vou  modelar usando o train 
+#gender submission me da: 0.76555
+#o Anterior conseguiu : 0,60526
+
+
+# O nosso codigo conseguiu : 0.9797525309336333
+
+
+### VIZUALIZAÇÃO DO BANCO DE DADOS ###
+
+## leganda do banco de dados ##
+#PassengerId - indentificador de cada passageiro 
+#survived - o que eu preciso prever , se sobreviveu ou não no naufragio 
+#Pclass - qual classe ele estava (1° , 2° , 3° )
+#name - é o nome né 
+#sex - seguindo a logica de mulheres e crianças priemiro 
+#idade - idade do individo 
+#SibSp - indicador se a pessoa estava viajando com alguém , acompanhante ou coisa do tipo 
+#Parch - se a pessoa estava aconapnhanda de filhos , ou era filha de alguém que estvaa lá 
+#Ticket - o numero d apassagem 
+# fare - é o preço da passsagem da pessoa 
+# cabin - o numero da cabine da pessoa 
+#Embarked - em qual porto ela embracou no navio( S,C , e mais um )
+
+
+
+
+
+##################  QUESTÃO 8.1 #####################
+## item A, B, C ##
+train = pd.read_csv('../input/titanic/train.csv')
+test = pd.read_csv('../input/titanic/test.csv')
+
+train = pd.read_csv('../input/titanic/train.csv')
+test = pd.read_csv('../input/titanic/test.csv')
+
+train_clean = train
+test_clean = test
+print()
+train.describe( )
+print()
+print()
+test.describe()
+train.info()
+print()
+print()
+test.info()
+print()
+print()
+print ('Os valores vazios')
+print()
+print('No dataframe de test')
+print(test_clean.isnull().sum())
+print()
+print()
+print('No dataframe de treino')
+print(train_clean.isnull().sum())
+
+
+
+
+
+####IMportando funções já criadas 
+
+
+
+#LIMPEZA DE DADOS DO TIPO NaN RECOMENDADA PELO NIAS
+
+# a mediana das idades faltando 
+media_idade = test_clean['Age'].median().round(4)
+test_clean['Age'] = test_clean['Age'].fillna(media_idade).round(4)
+
+media_idade_treino = train_clean['Age'].median().round(4)
+train_clean['Age'] = train_clean['Age'].fillna(media_idade_treino).round(4)
+
+# a mediana dos valores de fare faltando 
+media_fare = test_clean['Fare'].median().round(4)
+test_clean['Fare'] = test_clean['Fare'].fillna(media_fare).round(4)
+
+media_fare_treino = np.median(train_clean['Fare']).round(4)
+train_clean['Fare'] = train_clean['Fare'].fillna(media_fare_treino ).round(4)
+
+#a moda dos valores de embarked 
+moda = test['Embarked'].mode()
+test_clean['Embarked'] = test_clean['Embarked'].fillna(moda)
+moda_treino = train['Embarked'].mode()
+train_clean['Embarked'] = train_clean['Embarked'].fillna(moda_treino)
+
+
+test1= test_clean.loc[:,['Age', 'Fare', 'Sex', 'Embarked', 'Pclass', 'SibSp', 'Parch']]
+train1 = train_clean.loc[:,['Age', 'Fare', 'Sex', 'Embarked', 'Pclass', 'Survived', 'SibSp', 'Parch']]
+train1=train1.dropna()
+test1=test1.dropna()
+
+
+
+### Item D ### 
+
+# Usando de Auxilio uma função já existente. 
+from sklearn.preprocessing import OneHotEncoder
+
+
+def dummyEncode(pm):
+        columnsToEncode = list(pm.select_dtypes(include=['object']))
+        train1 = pm
+        test1 = test
+        s = (train1.dtypes == 'object')
+        oc = list(s[s].index)
+        le = OneHotEncoder(handle_unknown='ignore', sparse=False)
+        for feature in oc:
+            try:
+                one = pd.DataFrame(le.fit_transform(train1[oc]))
+                one.index=pm.index
+            except:
+                print('Error encoding '+feature)
+            one.columns = le.get_feature_names(oc)
+            v = pd.DataFrame(le.transform(pm[oc]))
+            c = pd.concat([pm,one], axis=1)
+            return c
+        
+        
+train_encordado = dummyEncode(train)
+teste_encordado = dummyEncode(test)
+display(train_encordado)
+
+
+
+# converter colunas categoricas em colunas numericas , usando a função do item 8.1 - d
+train_encordado = pd.get_dummies(train1, columns=['Sex', 'Embarked'])
+
+# Variavel de entrada pra treinar o modelo 
+#somente variaveis numericas
+features = ['Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Sex_female', 'Sex_male', 
+            'Embarked_C', 'Embarked_Q', 'Embarked_S']
+
+
+target = 'Survived'
+
+ 
+X = train_encordado[features].fillna(-1)
+#o que queremos prever 
+y = train_encordado[target]
+
+# O Modelo ## 
+from sklearn.ensemble import RandomForestClassifier
+#n_estimators - são a quantidade de arvores de decisão 
+#n_jobs - especifica o número de núcleos a serem usados para as principais tarefas de machine learning
+model = RandomForestClassifier(n_estimators=100, n_jobs=-1, random_state=0)
+#ajuste do modelo
+model.fit(X, y)
+
+#aplicando o preprocess para o teste da data
+test_encordado = pd.get_dummies(test, columns=['Sex', 'Embarked'])
+X_test = test_encordado[features].fillna(-1)
+
+# make predictions on the test data and save them to a CSV file
+x_prev = test_encordado[features]
+
+
+
+
+y_pred = model.predict(X_test)
+print("Acurácia no conjunto de treinamento:", model.score(X, y))
+
+
